@@ -33,7 +33,7 @@ spec:
 status: {}
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   labels:
     service: db
@@ -44,8 +44,8 @@ spec:
   selector:
     matchLabels:
       service: db
-  strategy:
-    type: Recreate
+  # strategy:
+  #   type: Recreate
   template:
     metadata:
       labels:
@@ -63,8 +63,20 @@ spec:
             - containerPort: 5432
               protocol: TCP
           resources: {}
+          volumeMounts:
+          - name: www
+            mountPath: /var/lib/postgresql/data
       restartPolicy: Always
-status: {}
+  volumeClaimTemplates:
+  - metadata:
+      name: www
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      # storageClassName: "my-storage-class"
+      resources:
+        requests:
+          storage: 1Gi
+# status: {}
 ---
 apiVersion: v1
 kind: Service
@@ -96,8 +108,9 @@ spec:
   ports:
     - name: "5432"
       port: 5432
-      targetPort: 5432
+      # targetPort: 5432
+  clusterIP: "None"
   selector:
     service: db
-status:
-  loadBalancer: {}
+# status:
+  # loadBalancer: {}
