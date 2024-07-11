@@ -19,7 +19,7 @@ spec:
       initContainers:
         - name: wait-for-db
           image: busybox:1.28
-          command: ['sh', '-c', 'until nc -zv db3 5432; do echo "waiting for db"; sleep 2; done;']
+          command: ['sh', '-c', 'until nc -zv db-0.db3.default.svc.cluster.local 5432; do echo "waiting for db"; sleep 2; done;']
       containers:
         - image: amrali21/docker-kubernetes-net-6
           name: server
@@ -40,6 +40,7 @@ metadata:
   name: db
   namespace: default
 spec:
+  serviceName: "db3"
   replicas: 1
   selector:
     matchLabels:
